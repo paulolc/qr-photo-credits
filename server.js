@@ -25,27 +25,13 @@ server.listen( process.env.PORT || 3000, process.env.IP || "0.0.0.0", function()
 });
 
 function getImgUrl( req ){
-  var urlstr = req.url.replace(/^.*http:\/\//,"http://") ;
+  //REMINDER: use express Luke: req.query.url
+  var urlpath = urlparse.parse( req.url ).path;
+  var urlstr = urlpath.replace(/^.*http:\/\//,"http://") ;
   var url = urlparse.parse( urlstr );
-  console.log("url.host: " + url.host);
-  if( url.host !== "" ){
-    return urlstr;
-  }
-  var imgurl = req.query.url || originalImgUrl ;
-  console.log("imgurl: " + imgurl);
-  return imgurl; 
+  var imgurl = ( url.host !== null ? urlstr : originalImgUrl );
+  return imgurl;
 }
-
-/*
-function isImageUrl( url ){
-    request.head( url ).on('response', function(response){ 
-      var contentType = response.headers['content-type'];
-      var fileType = contentType.split("/")[0];
-      var isImage = (fileType === "image")
-    });
-    
-}
-*/
 
 router.get('/*', function(req, res) {
   originalImgUrl = getImgUrl( req );
@@ -60,7 +46,7 @@ router.get('/*', function(req, res) {
     qrcode_img.src = qrCodeBuffer;
 
     request.get( originalImgUrl, function (err, response, buffer) {
-      if(err) return getHttpErrorHandler(res)(err);
+      if(err) return getHttpErrorHandler(res)(err, 'Error while retrieving image url: ' + originalImgUrl);
       Caman(buffer,function(){
         /* Apply caman filters here */
         this.render( function(){ 
@@ -108,8 +94,14 @@ function errorHandler( err ){
 }
 
 function getHttpErrorHandler( res ){
-  var handler = function( err ){
-    res.status( 503 ).send("I'm so sorry. Something went wrong on the server. Maybe if you come back later...");    
+  var handler = function( err , msg ){
+    var errMsg = "I'm so sorry. Something went wrong on the server.\n" 
+      + "Maybe if you come back later...";
+    if (msg){
+      errMsg += "The excuse this time was: '" + msg + "'";
+    }
+
+    res.status( 503 ).send(errMsg);    
     errorHandler(err);
   };
   
