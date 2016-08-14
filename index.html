@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Bootstrap 101 Template</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="app.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <div class="container">
+        <h2>Add the photo credits to the photo!</h2>
+        <p>Just put the photo url in the input box and overlay a qr-code with a link to the photo.</p>
+        <p>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div id="photo-url-validation-status-textbox" class="form-group  has-error has-feedback">
+                        <input id="photo-url" type="text" placeholder="Photo url" class="form-control" onchange="validateUrl()">
+                        <span id="photo-url-validation-status-icon" class="glyphicon glyphicon-remove form-control-feedback"></span>
+                    </div>
+                </div>
+            </div>
+    
+    
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="container">
+                        <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="email">Author:</label>
+                                <div class="col-sm-9">
+                                    <input type="input" class="form-control" id="pwd" placeholder="Author name or url ">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="pwd">Source:</label>
+                                <div class="col-sm-9">
+                                    <input id="photo-source" type="input" class="form-control" id="pwd" placeholder="Enter the photo source ">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="form-group disabled">
+                <a id="add-button" class="btn btn-primary" href="#" role="button" onclick="doFunction();">
+                    Add Photo Credits     
+                </a>
+            </div>
+    
+
+                <div class="container">
+                    <img id="original-image" class="img-responsive" alt="">
+                </div>
+
+            <div class="container">
+                    <img id="result-image" class="img-responsive" alt="CUCU">
+            </div>
+
+    
+    
+<!--
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <div class="form-group">
+                        <label for="b64imagewithcredits">Text to copy to the Browser Upload Image Dialog: </label>
+                        <textarea class="form-control" rows="5" id="b64imagewithcredits"></textarea>
+                    </div>
+    
+                    <div class="container">
+                        <img id="original-image" class="img-responsive" alt="">
+                    </div>
+                </div>
+            </div>
+-->    
+    
+    </div>
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/camanjs/4.1.2/caman.full.min.js"></script>
+    <script>
+
+        var validating = false;
+        var caman;
+
+        function validateUrl(){
+            if( validating ){
+                return;
+            }
+            validating = true;
+            var imageUrl = document.getElementById('photo-url').value;
+            //parser.href  = imageUrl;
+            //console.log( "validateUrl(): ", imageUrl);
+            //console.log( "parser.host: " , parser.host)
+            if( isUrlValid(imageUrl) ){
+                $('#photo-source').val(imageUrl);
+                $('#add-button').removeClass('disabled');
+                $('#photo-url-validation-status-textbox').removeClass('has-error');
+                $('#photo-url-validation-status-icon').removeClass('glyphicon-remove');
+                $('#photo-url-validation-status-textbox').addClass('has-success');
+                $('#photo-url-validation-status-icon').addClass('glyphicon-ok');
+            } else {
+                $('#photo-source').val("");
+                $('#add-button').addClass('disabled');
+                $('#photo-url-validation-status-textbox').removeClass('has-success');
+                $('#photo-url-validation-status-icon').removeClass('glyphicon-ok');
+                $('#photo-url-validation-status-textbox').addClass('has-error');
+                $('#photo-url-validation-status-icon').addClass('glyphicon-remove');
+            }
+            validating = false;            
+        }
+
+        function doFunction() {
+
+            var imageUrl = document.getElementById('photo-url').value;
+
+            var imagesLoaded = 0;
+
+            var img1;  
+            var img2;
+            var qrCodeSize = 500;
+
+
+            loadImage(imageUrl, imageLoaded);
+
+            function imageLoaded( imgDataUrl ) {
+                imagesLoaded += 1;
+                if (imagesLoaded == 1) {
+                    img1 = new Image();
+                    img1.onload = function(){
+                        document.getElementById("original-image").src = imgDataUrl;
+                        qrCodeSize = Math.floor( 0.2 * img1.height );
+                        console.log("qrCodeSize: " + qrCodeSize);
+                        loadImage('http://crossorigin.me/https://api.qrserver.com/v1/create-qr-code/?size=' + qrCodeSize + 'x' + qrCodeSize + '&data=' + encodeURIComponent(imageUrl), imageLoaded);
+                    }
+                    img1.src = imgDataUrl;
+                }
+
+                if (imagesLoaded == 2) {
+                    imagesLoaded = 0;
+                    img2 = new Image();
+                    img2.onload = function(){
+                        composeImages();
+                    }
+                    img2.src = imgDataUrl;
+                }
+            }
+
+            function loadImage(url, callback, outputFormat) {
+                //var img = new Image();
+
+                //img.onload = cb;
+                //img.src = src;
+
+                var canvas = document.createElement('CANVAS');
+                var ctx = canvas.getContext('2d');
+                var img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = function () {
+                    canvas.height = img.height;
+                    canvas.width = img.width;
+                    ctx.drawImage(img, 0, 0);
+                    var dataUrl = canvas.toDataURL(outputFormat || 'image/png');
+                    dude = dataUrl;
+                    canvas = null;
+                    callback.call(this, dataUrl);
+                };
+                img.src = url;
+                //return img;
+
+            }
+
+
+
+            function composeImages() {
+                // composite now
+
+
+                caman = Caman("#original-image", function() {
+                    //this.brightness(50).render();
+                    var canvas = caman.canvas;
+                    //canvas.height = img1.height;
+                    //canvas.width = img1.width;
+                    var ctx = canvas.getContext("2d",{alpha: false});
+
+
+                    //ctx.drawImage(img1, 0, 0);
+
+                    //ctx.globalAlpha = 0.5;
+
+                    var border = Math.floor(0.1 * img2.height);
+                    ctx.beginPath();
+                    ctx.fillStyle = "white";
+                    ctx.rect(img1.width - img2.width - border, img1.height - img2.height - border, img1.width, img1.height);
+                    //ctx.rect(100,100,100,100);
+                    ctx.fill();
+
+                    console.log("border: " + border);
+                    console.log("img1.height: " + img1.height);
+                    console.log("img2.height: " + img2.height);
+
+                    ctx.drawImage(img2, img1.width - img2.width, img1.height - img2.height);
+
+
+
+                    var fontSize = 0.03 * canvas.height;
+                    var qrCodeSize = 0.1 * canvas.height;
+
+                    ctx.font = "" + fontSize + "px Verdana";
+                    // Create gradient
+                    // Fill with gradient
+                    ctx.fillStyle = "white";
+                    ctx.fillText("Source: " + imageUrl, 10, canvas.height - fontSize);
+                    caman.reloadCanvasData();
+                    document.getElementById( 'result-image').src = canvas.toDataURL();
+
+                });
+
+
+            }
+
+
+        }
+
+            function isUrlValid(userInput) {
+                console.log(userInput);
+                var regexQuery = "(http(s)?://)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
+                var url = new RegExp(regexQuery,"g");
+                if (url.test(userInput)) {
+                  return true;
+                }
+                return false;
+            }
+
+        /*        
+                function doFunction() {
+                    var canvas = document.getElementById("canvas");
+                    var ctx = canvas.getContext("2d");
+                    
+                    var imagesLoaded = 0;
+                    var imageUrl = document.getElementById('photo-url').value;
+
+                    var img1 = loadImage(imageUrl, imageLoaded);
+                    var img2 = loadImage('https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(imageUrl)  , imageLoaded);
+                    
+                    
+                    function imageLoaded(){
+                        imagesLoaded += 1;
+                        if(imagesLoaded == 2) {
+                            imagesLoaded = 0;
+                            composeImages();
+                        }
+                    }
+
+                    function loadImage(src, cb) {
+                        var img = new Image();
+                        
+                        img.onload = cb;
+                        img.src = src;
+                    
+                        return img;
+                    }
+
+
+
+                    function composeImages(){
+                        // composite now
+                        canvas.height = img1.height;
+                        canvas.width = img1.width;
+                        
+                        ctx.drawImage(img1, 0, 0);
+                        
+                        //ctx.globalAlpha = 0.5;
+                
+                        var border = 5;        
+                        ctx.beginPath();
+                        ctx.fillStyle="white";
+                        ctx.rect( img1.width-img2.width - border, img1.height - img2.height -border , img1.width, img1.height );
+                        //ctx.rect(100,100,100,100);
+                        ctx.fill();
+                        
+                        ctx.drawImage(img2, img1.width-img2.width, img1.height - img2.height);
+                    }
+                }
+                
+        */
+
+
+        /*
+                function doFunction(){
+                    $('#add-button').toggleClass('active');
+
+                    var imageUrl = document.getElementById('photo-url').value;
+                    document.getElementById("original-image").src = imageUrl;
+
+
+                    caman = Caman("#original-image", function () {
+                       //this.brightness(50).render();
+                       var canvas = caman.canvas;
+                        var ctx=canvas.getContext("2d");
+                        var fontSize = 0.1 * canvas.height;
+                        
+                        ctx.font="20px Georgia";
+                        ctx.fillText("Hello World!",10,50);
+                        
+                        ctx.font=""+fontSize+"px Verdana";
+                        // Create gradient
+                        var gradient=ctx.createLinearGradient(0,0,canvas.width,0);
+                        gradient.addColorStop("0","magenta");
+                        gradient.addColorStop("0.5","blue");
+                        gradient.addColorStop("1.0","red");
+                        // Fill with gradient
+                        ctx.fillStyle=gradient;
+                        ctx.fillText("Big smile!",10,canvas.height - fontSize);
+                        caman.reloadCanvasData();
+
+
+                        $('#add-button').toggleClass('active');
+                    });
+
+                }
+          */
+
+
+    </script>
+</body>
+
+</html>

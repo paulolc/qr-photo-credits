@@ -1,0 +1,18 @@
+{
+  "name": "qr-photo-credits",
+  "version": "1.0.0",
+  "description": "webservice that given a web photo overlays its url and a qrcode on itself",
+  "main": "server.js",
+  "repository": "",
+  "author": "Paulo Carvalho <plcarvalho@gmail.com>",
+  "dependencies": {
+    "async": "~0.2.8",
+    "caman": "^4.1.2",
+    "canvas": "^1.4.0",
+    "concat-stream": "^1.5.1",
+    "express": "~3.2.4",
+    "qr-image": "^3.1.0",
+    "request": "^2.74.0",
+    "stream-to": "^2.0.0"
+  }
+}
