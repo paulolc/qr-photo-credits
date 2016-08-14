@@ -27,9 +27,12 @@ server.listen( process.env.PORT || 3000, process.env.IP || "0.0.0.0", function()
 function getImgUrl( req ){
   //REMINDER: use express Luke: req.query.url
   var urlpath = urlparse.parse( req.url ).path;
-  var urlstr = urlpath.replace(/^.*http:\/\//,"http://") ;
+  var urlstr = urlpath.replace(/^.*http/,"http") ;
   var url = urlparse.parse( urlstr );
   var imgurl = ( url.host !== null ? urlstr : originalImgUrl );
+  console.log("urlpath: " + urlpath);
+  console.log("urlstr: " + urlstr);
+  console.log("imgurl: " + imgurl);
   return imgurl;
 }
 
@@ -50,7 +53,6 @@ router.get('/*', function(req, res) {
       Caman(buffer,function(){
         /* Apply caman filters here */
         this.render( function(){ 
-          console.log("saving image to: " + __dirname );
           console.log( util.inspect(this.canvas));
   
           var canvas = this.canvas;
