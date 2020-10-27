@@ -10,7 +10,7 @@
     "caman": "^4.1.2",
     "canvas": "^1.4.0",
     "concat-stream": "^1.5.1",
-    "express": "~3.2.4",
+    "express": "~4.17.1",
     "qr-image": "^3.1.0",
     "request": "^2.74.0",
     "stream-to": "^2.0.0"
